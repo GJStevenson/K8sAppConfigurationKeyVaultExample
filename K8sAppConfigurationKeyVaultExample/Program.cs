@@ -20,7 +20,8 @@ namespace K8sAppConfigurationKeyVaultExample
           WebHost.CreateDefaultBuilder( args )
              .ConfigureAppConfiguration( ( ctx, builder ) =>
                 {
-                   var keyVaultEndpoint = GetKeyVaultEndpoint();
+                   var settings = builder.Build();
+                   var keyVaultEndpoint = settings["KeyVaultEndpoint"];
                    if ( !string.IsNullOrEmpty( keyVaultEndpoint ) )
                    {
                       var azureServiceTokenProvider = new AzureServiceTokenProvider();
@@ -31,13 +32,10 @@ namespace K8sAppConfigurationKeyVaultExample
                          keyVaultEndpoint, keyVaultClient, new DefaultKeyVaultSecretManager() );
                    }
 
-                   var settings = builder.Build();
                    builder.AddAzureAppConfiguration( options =>
                       options.Connect( settings["ConnectionStrings:AppConfig"] )
                          .Watch( "FromAppConfiguration", pollInterval: TimeSpan.FromSeconds(1)) );
                 }
              ).UseStartup<Startup>();
-
-      private static string GetKeyVaultEndpoint() => "https://K8sInnovationTime.vault.azure.net";
    }
 }
