@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Razor.Language;
+using Microsoft.Extensions.Configuration;
 
 namespace K8sAppConfigurationKeyVaultExample.Controllers
 {
@@ -7,11 +9,17 @@ namespace K8sAppConfigurationKeyVaultExample.Controllers
    [ApiController]
    public class ValuesController : ControllerBase
    {
+      private readonly IConfiguration _configuration;
+      public ValuesController(IConfiguration configuration)
+      {
+         _configuration = configuration;
+      }
+
       // GET api/values
       [HttpGet]
       public ActionResult<IEnumerable<string>> Get()
       {
-         return new string[] { "value1", "value2" };
+         return new string[] { $"FromKeyVault: {_configuration["FromKeyVault"]}" };
       }
 
       // GET api/values/5
