@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore;
+﻿using System;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Configuration.AzureKeyVault;
 
 namespace K8sAppConfigurationKeyVaultExample
@@ -28,6 +30,11 @@ namespace K8sAppConfigurationKeyVaultExample
                       builder.AddAzureKeyVault(
                          keyVaultEndpoint, keyVaultClient, new DefaultKeyVaultSecretManager() );
                    }
+
+                   var settings = builder.Build();
+                   builder.AddAzureAppConfiguration( options =>
+                      options.Connect( settings["ConnectionStrings:AppConfig"] )
+                         .Watch( "FromAppConfiguration", pollInterval: TimeSpan.FromSeconds(1)) );
                 }
              ).UseStartup<Startup>();
 
