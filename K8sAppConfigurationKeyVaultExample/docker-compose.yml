@@ -1,0 +1,7 @@
+version: '3'
+services:
+   web:
+      image: 'gjstevenson/kvactest'
+      build: .
+      ports:
+      - "80:80"
