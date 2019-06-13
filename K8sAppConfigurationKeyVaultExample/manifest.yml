@@ -10,27 +10,32 @@ spec:
   - port: 80
   type: ClusterIP
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
   name: kvactest
   labels:
     app: ex
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ex
-  template:
-    metadata:
-      labels:
-        app: ex
-    spec:
-      containers:
-      - name: kvactest
-        image: gjstevenson/kvactest:latest
-        ports:
-        - containerPort: 80
+  containers:
+  - image: gjstevenson/kvactest:latest
+    name: kvactest
+    volumeMounts:
+      - name: kvmnt
+        mountPath: /kvmnt
+  volumes:
+  - name: kvmnt
+    flexVolume:
+      driver: "azure/kv"
+      secretRef:
+        name: kvcreds
+      options:
+        keyvaultname: "K8sInnovationTime"
+        keyvaultobjectnames: "FromKeyVault;AppConfigurationConnectionString"
+        keyvaultobjecttypes: secret;secret
+        resourcegroup: "K8sInnovationTime"
+        subscriptionid: "758f1337-2c46-4da1-8795-1e9fe67d4ef4"
+        tenantid: "2c8ba3fc-5acb-426d-a06d-3d7c5a505151"
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
