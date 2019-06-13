@@ -20,6 +20,7 @@ cassette-cache/
 csx/
 .vs/
 external.config
+*.vscode/
 
 #Ignore packages
 [Pp]ackages/
