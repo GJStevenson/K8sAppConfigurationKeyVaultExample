@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Azure.KeyVault;
@@ -21,6 +22,8 @@ namespace K8sAppConfigurationKeyVaultExample
              .ConfigureAppConfiguration( ( ctx, builder ) =>
                 {
                    var settings = builder.Build();
+
+                   builder.AddKeyPerFile(directoryPath: "/kvmnt/", optional: true);
                    var keyVaultEndpoint = settings["KeyVaultEndpoint"];
                    if ( !string.IsNullOrEmpty( keyVaultEndpoint ) )
                    {
@@ -31,11 +34,16 @@ namespace K8sAppConfigurationKeyVaultExample
                       builder.AddAzureKeyVault(
                          keyVaultEndpoint, keyVaultClient, new DefaultKeyVaultSecretManager() );
                    }
-
-                   builder.AddAzureAppConfiguration( options =>
-                      options.Connect( settings["ConnectionStrings:AppConfig"] )
-                         .Watch( "FromAppConfiguration", pollInterval: TimeSpan.FromSeconds(1)) );
                 }
-             ).UseStartup<Startup>();
+             ).ConfigureAppConfiguration( (ctx, builder )  => {
+                   var settings = builder.Build();
+                   var azureConfigConnectionString = settings["AppConfigurationConnectionString"];
+                   if (!string.IsNullOrWhiteSpace(azureConfigConnectionString))
+                   {
+                      builder.AddAzureAppConfiguration( options =>
+                        options.Connect( azureConfigConnectionString )
+                           .Watch( "FromAppConfiguration", pollInterval: TimeSpan.FromSeconds(1)) );
+                   }
+             }).UseStartup<Startup>();
    }
 }
