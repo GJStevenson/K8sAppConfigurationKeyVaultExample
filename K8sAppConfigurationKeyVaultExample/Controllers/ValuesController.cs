@@ -22,6 +22,13 @@ namespace K8sAppConfigurationKeyVaultExample.Controllers
          return new string[] { $"From Key Vault: {_configuration["FromKeyVault"]}", $"From App Configuration: {_configuration["FromAppConfiguration"]}" };
       }
 
+      // GET api/values/all
+      [HttpGet("all")]
+      public ActionResult<string> GetAll()
+      {
+         return string.Join(',', _configuration.AsEnumerable());
+      }
+
       // GET api/values/5
       [HttpGet( "{id}" )]
       public ActionResult<string> Get( int id )
