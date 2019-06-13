@@ -33,7 +33,6 @@ namespace K8sAppConfigurationKeyVaultExample
             app.UseHsts();
          }
 
-         app.UseHttpsRedirection();
          app.UseMvc();
       }
    }
